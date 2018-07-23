@@ -3,6 +3,6 @@ FROM lucapinello/crispresso
 # Dockerfile author / maintainer 
 MAINTAINER Gerry Meixiong <gerry.meixiong@czbiohub.org> 
 
-RUN conda update -n base conda && conda install -c bioconda trimmomatic && conda install -c anaconda boto3 && conda install -c conda-forge awscli 
+RUN conda update -n base conda && conda install -c bioconda trimmomatic && conda install -c conda-forge awscli 
  
 
