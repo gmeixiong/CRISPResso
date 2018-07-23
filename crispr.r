@@ -1,10 +1,10 @@
 ##Pulling the names of all fastq files in the directed folder, as well as reference file excel sheet
 ######CHANGE THIS VARIABLE##########
-datafolder <- "Sortedfastq"
+datafolder <- "fastqs"
 #######DID YOU CHANGE THE VARIABLE?#######
 
 ######CHANGE THIS VARIABLE##########
-referenceseq <- "CRISPResso pipeline 96wp1sorted sample sheet.xlsx"
+referenceseq <- "96wp1sorted_sample_sheet.xlsx"
 #######DID YOU CHANGE THE VARIABLE?#######
 
 ##Where are the trimmomatic PE adapters?###
@@ -26,17 +26,16 @@ stdevfrag <- "45"
 
 
 #Incorporation of libraries for script
-library(S4Vectors)
+# library(S4Vectors)
 library(readxl)
 library(plyr)
 library(stringr)
-library(gdata)
-library(knitr)
+# library(gdata)
+# library(knitr)
 library(tidyverse)
-library(Rsamtools)
-library(rtracklayer)
-library(Biostrings)
-library(readxl)
+# library(Rsamtools)
+# library(rtracklayer)
+# library(Biostrings)
 
 foldertxt <- paste0(datafolder,"/")
 all_fq_fnames <- dir(datafolder, "R._001.fastq.gz$", recursive=TRUE, full=TRUE)
@@ -47,6 +46,8 @@ fq_df <- data_frame(all_fq_fnames)
 fq_df$fq_fwd <- NA
 fq_df$fq_rev <- NA
 
+
+print(fq_df())
 
 ##For loop iterating through all of the fastq files, pulling out any reads that are designated as "forward" with the _R1_ designation
 ##If a read is found, it is placed in the second column of fq_df - all forward reads will be placed here

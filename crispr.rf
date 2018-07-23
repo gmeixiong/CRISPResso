@@ -1,0 +1,24 @@
+/* Reflow workflow for B-cell repertoire sequencing pipeline. Developed at Chan
+   Zuckerberg Biohub. BraCeR. */
+
+/* Input: file_1 and file_2 are FASTQ files containing #1 and #2 mates from paired-
+   end sequencing. file_1 can be all reads from single-end sequencing. In this case,
+   do not input a file_2.  */
+param (
+	python_script string
+	fastq_folder string
+	docker_image = "gmeixiong/crispresso"
+)
+
+val dirs = make("$/dirs")
+
+func CrispressoRun(python_script file, fastq_folder dir) dir = 
+	exec(image := docker_image) (outdir dir) {"
+		/opt/conda/bin/python {{python_script}} {{fastq_folder}} {{outdir}} >> {{outdir}}/output.txt
+	"}
+
+val crispr_res = CrispressoRun(file(python_script), dir(fastq_folder))
+val crispresso_bucket = dirs.Copy(crispr_res, "s3://gmeixiong-bucket/crispresso_test")
+
+@requires(cpu := 8, mem := 32*GiB, disk := 200*GiB)
+val Main = crispresso_bucket
