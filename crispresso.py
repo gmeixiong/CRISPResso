@@ -12,6 +12,7 @@ def parseArgs():
 	parser.add_argument('trimdir')
 	parser.add_argument('crispdir')
 	parser.add_argument('--s3', action="store_true")
+	parser.add_argument('--s3bucket', default="gmeixiong-bucket")
 	return parser.parse_args()
 
 def initDataFrame(fastq_folder):
@@ -67,16 +68,14 @@ def crispresso_worker(row):
 	fq_name = getFastqName(row, args.datafolder + '/')
 	##FLASH run
 	flash_cmd = '/root/CRISPResso_dependencies/bin/flash -r ' + str(readleng) + ' -f ' + str(fragleng) + ' -s ' + str(stdevfrag) + ' -o ' + fq_name + ' -d ' + args.flashdir + ' -z ' + row['fq_fwd'] + ' ' + row['fq_rev']
-
 	##Removing adapters from reads, then passing them through quality filter, saving in new folder
 	##See trimmomatic for settings. A sliding window searches along for quality score at a minimum of 
 	##20 PHRED33 score, also trimming any adapter sequences. 
 	trim_cmd = '/opt/conda/bin/trimmomatic SE ' + row.combined + ' ' + row.qual_P + ' ' + 'ILLUMINACLIP:' + adapterloc + ':2:30:10 LEADING:' + str(leadingqual) \
 	+ ' TRAILING:' + str(trailingqual) + ' SLIDINGWINDOW:' + str(slidewindsiz) + ':' + str(slidewindqual) + ' MINLEN:' + str(minlength)	
-
 	##CRISPResso run
 	crispresso_cmd = '/opt/conda/bin/CRISPResso -r1 ' + row.qual_P + ' -a ' + row.reference + ' -e ' + row.HDR + ' -g ' + row.guideseq + ' -o ' + args.crispdir
-
+	
 	os.system(flash_cmd)
 	os.system(trim_cmd)
 	os.system(crispresso_cmd)
@@ -115,9 +114,8 @@ def main():
 		p.join()
 
 	if args.s3:
-		s3bucket = 'gmeixiong-bucket'
 		destination = 'CRISPResso_OUT'
-		s3_cmd = "aws s3 cp " + args.crispdir + ' s3://' + s3bucket + '/' + destination + ' --recursive'
+		s3_cmd = "aws s3 cp " + args.crispdir + ' s3://' + args.s3bucket + '/' + destination + ' --recursive'
 		os.system(s3_cmd)
 		
 if __name__ == "__main__":
